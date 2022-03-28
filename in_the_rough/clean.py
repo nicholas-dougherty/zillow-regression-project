@@ -125,39 +125,53 @@ def wrangled_zillow(train, validate, test):
 
 
 def describe_data(df):
-    print('The first three rows are: ')
-    print('----------------------------------------------------------')
-    print(df.head(3))
-    print('----------------------------------------------------------')
-    print("The data frame's shape is: ")
-    print('-------------------------')
-    print(f' Rows: {df.shape[0]} \n Columns: {df.shape[1]}')
-    print('-------------------------')   
-    print('The data types and column names are: ')
-    print(sorted(df))
+    '''
+    This function takes in a pandas dataframe and prints out the shape, datatypes, number of missing values, 
+    columns and their data types, summary statistics of numeric columns in the dataframe, as well as the value counts for categorical variables.
+    '''
+    # Print out the "shape" of our dataframe - rows and columns
+    print(f'This dataframe has {df.shape[0]} rows and {df.shape[1]} columns.')
+    print('')
+    print('--------------------------------------')
+    print('--------------------------------------')
+    
+    # print the datatypes and column names with non-null counts
     print(df.info())
-    print('----------------------------------------------------------')   
-    print('The summary statistics are as follows: ')
-    print('----------------------------------------------------------')
-    print(df.describe())
-    print('----------------------------------------------------------')      
-    print(f'The number of NA\'s is:')
-    print('-------------------------')
-    print(df.isna().sum())
-    print('-------------------------')
-    print ('\nMissing values :  ', df.isnull().sum().values.sum())
-    print('----------------------------------------------------------')  
-    print('Unique Values for the Columns:')
-    print('-------------------------')
-    limit = 10
+    print('')
+    print('--------------------------------------')
+    print('--------------------------------------')
+
+    # print the number of missing values per column and the total
+    print('Null Values: ')
+    missing_total = df.isnull().sum().sum()
+    missing_count = df.isnull().sum() # the count of missing values
+    value_count = df.isnull().count() # the count of all values
+    missing_percentage = round(missing_count / value_count * 100, 2) # percentage of missing values
+    missing_df = pd.DataFrame({'count': missing_count, 'percentage': missing_percentage}) # create df
+    print(missing_df)
+    print(f' \n Total Number of Missing Values: {missing_total} \n')
+    df_total = df[df.columns[:]].count().sum()
+    proportion_of_nulls = round((missing_total / df_total), 4)
+    print(f' Proportion of Nulls in Dataframe: {proportion_of_nulls}\n') 
+    print('--------------------------------------')
+    print('--------------------------------------')
+
+    # print out summary stats for our dataset
+    print('Here are the summary statistics of our dataset')
+    print(df.describe().applymap(lambda x: f"{x:0.3f}"))
+    print('')
+    print('--------------------------------------')
+    print('--------------------------------------')
+
+    print('Relative Frequencies: \n')
+    # Display top 5 values of each variable within reasonable limit
+    limit = 25
     for col in df.columns:
         if df[col].nunique() < limit:
-            print(f'Column: {col} \n')
-            print(f'Unique Values: {df[col].unique()} \n')
-            print(f'Absolute frequencies: \n {df[col].value_counts()} \n')
-            print(f'Relative frequencies: \n {df[col].value_counts(normalize=True)} \n')
+            print(f'Column: {col} \n {round(df[col].value_counts(normalize=True).nlargest(5), 3)} \n')
         else: 
             print(f'Column: {col} \n')
             print(f'Range of Values: [{df[col].min()} - {df[col].max()}] \n')
-        print('-----------------------')
-    print('-------Done-zo-------------')
+        print('------------------------------------------')
+        print('--------------------------------------')
+    
